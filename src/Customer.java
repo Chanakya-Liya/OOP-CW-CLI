@@ -40,17 +40,17 @@ public class Customer extends User implements Runnable {
             try {
                 for(int i = 0; i < retrievalRate; i++){
                     boolean flag = true;
-                    while(flag){
+                    while(flag) {
                         int eventId = Util.generateRandomInt(0, Util.getEvents().size());
                         Event selectedEvent = Util.getEvents().get(eventId);
                         synchronized (selectedEvent){
-                            if(Util.getEvents().get(eventId).getPoolTicketsAvailable() > 0){
+                            if(!Util.getEvents().get(eventId).getPoolTickets().isEmpty()){
                                 Util.getEvents().get(eventId).removeTicketFromPool();
                                 System.out.println(BLUE + Util.getEvents().get(eventId) + " CustomerId: " + CustomerId + RESET);
                                 flag = false;
+                                totalTickets--;
                             }
                         }
-
                     }
                 }
                 Thread.sleep(frequency * 1000L);

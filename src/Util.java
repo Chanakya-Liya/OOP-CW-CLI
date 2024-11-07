@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -74,21 +75,23 @@ public class Util {
 
     public static void generateSimulatedUsers(){
         try {
-            Scanner scanner = new Scanner(System.in);
             System.out.println("Welcome");
-            System.out.print("How many Customers would you like to simulate: ");
-            int simulateCustomers = scanner.nextInt();
-            System.out.print("How many Vendors would you like to simulate: ");
-            int simulateVendors = scanner.nextInt();
-            System.out.print("How many events would you like to simulate: ");
-            int simulatedEvents= scanner.nextInt();
-            System.out.print("How many tickets would you like the customers to buy per frequency(ticket amount) or type 0 to randomize it to each customer: ");
-            int customerRetrieve = scanner.nextInt();
-            System.out.print("How frequently would you like the customers to buy tickets (sec) or type 0 to randomize it to each customer: ");
-            int customerFrequency = scanner.nextInt();
-            System.out.print("How frequently would you like an event to add tickets to the pool (sec) or type 0 to randomize it to each customer: ");
-            int eventFrequency = scanner.nextInt();
+            int simulateCustomers = validateUserInput("How many Customers would you like to simulate");
+            int simulateVendors = validateUserInput("How many Vendors would you like to simulate");
+            int simulatedEvents= validateUserInput("How many events would you like to simulate");
+            int customerRetrieve = validateUserInput("How many tickets would you like the customers to buy per frequency(ticket amount) or type 0 to randomize it to each customer");
+            int customerFrequency = validateUserInput("How frequently would you like the customers to buy tickets (sec) or type 0 to randomize it to each customer");
+            int eventFrequency = validateUserInput("How frequently would you like an event to add tickets to the pool (sec) or type 0 to randomize it to each customer");
 
+            if(simulateCustomers == 0){
+                simulateCustomers = generateRandomInt(100, 3000);
+            }
+            if(simulateVendors == 0){
+                simulateVendors = generateRandomInt(5, 15);
+            }
+            if(simulatedEvents == 0){
+                simulatedEvents = generateRandomInt(20, 45);
+            }
             for(int i = 0; i < simulateCustomers; i++){
                 Customer customer = new Customer(Util.generateRandomString("fname"), Util.generateRandomString("lname"), Util.generateRandomString("username"), Util.generateRandomString("password"), Util.generateRandomString("email"), true, Util.generateRandomSmallInt(50), Util.generateRandomSmallInt(30));
                 if(customerFrequency != 0){
@@ -104,7 +107,7 @@ public class Util {
                 vendors.add(vendor);
             }
             for(int i = 0; i < simulatedEvents; i++){
-                Event event = new Event(Util.generateRandomInt(10000, 30000), Util.generateRandomSmallInt(4000), Util.generateRandomInt(100000, 1000000), Util.generateRandomSmallInt(60));
+                Event event = new Event(Util.generateRandomInt(10000, 30000), Util.generateRandomInt(5000, 7000), Util.generateRandomInt(60000, 80000), Util.generateRandomSmallInt(5));
                 if(eventFrequency != 0){
                     event.setFrequency(eventFrequency);
                 }
@@ -119,4 +122,25 @@ public class Util {
             System.out.println(e);
         }
     }
+
+    public static int validateUserInput(String prompt){
+        Scanner scanner = new Scanner(System.in);
+        int option = -1;
+
+        System.out.printf("%s: ", prompt);
+
+        while (option < 0) {
+            try {
+                option = scanner.nextInt();
+                if (option < 0) {
+                    System.out.print("Invalid input. Please enter a positive number or 0 to randomize: ");
+                }
+            } catch (InputMismatchException e) {
+                System.out.print("Invalid input. Please enter a positive number or 0 to randomize: ");
+                scanner.nextLine();  // Clear the invalid input
+            }
+        }
+        return option;
+    }
+
 }

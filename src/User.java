@@ -4,13 +4,13 @@ import java.util.logging.Logger;
 
 abstract class User {
     private static int nextId = 1;
-    private int id;
+    private final int id;
     private final String fName;
     private final String lName;
     private String username;
     private String password;
     private String email;
-    private boolean simulated = false;
+    private final boolean simulated;
     private static final Logger logger = Logger.getLogger(User.class.getName());
 
     public User(String fName, String lName, String username, String password, String email, boolean simulated) {
@@ -81,7 +81,7 @@ abstract class User {
         return password;
     }
 
-    public void setPassword(String password) throws NoSuchAlgorithmException {
+    public void setPassword(String password) {
         this.password = hashPassword(password);
     }
 

@@ -1,0 +1,22 @@
+{
+  "event":{
+    "eventCount": 0,
+    "ticketPoolSize":0,
+    "releaseRate": 0,
+    "frequency": 0,
+    "randomEventCountMin": 20,
+    "randomEventCountMax": 45
+  },
+  "customer": {
+    "customerCount": 0,
+    "retrievalRate": 0,
+    "frequency":  0,
+    "randomCustomerCountMin": 100,
+    "randomCustomerCountMax": 3000
+  },
+  "vendor": {
+    "vendorCount": 0,
+    "randomVendorCountMin": 5,
+    "randomVendorCountMax": 15
+  }
+}
