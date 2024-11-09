@@ -76,9 +76,9 @@ public class Util {
     public static void generateSimulatedUsers(){
         try {
             System.out.println("Welcome");
-            int simulateCustomers = validateUserInput("How many Customers would you like to simulate");
-            int simulateVendors = validateUserInput("How many Vendors would you like to simulate");
-            int simulatedEvents= validateUserInput("How many events would you like to simulate");
+            int simulateCustomers = validateUserInput("How many Customers would you like to simulate (Press 0 to Randomize)");
+            int simulateVendors = validateUserInput("How many Vendors would you like to simulate (Press 0 to Randomize)");
+            int simulatedEvents= validateUserInput("How many events would you like to simulate (Press 0 to Randomize)");
             int customerRetrieve = validateUserInput("How many tickets would you like the customers to buy per frequency(ticket amount) or type 0 to randomize it to each customer");
             int customerFrequency = validateUserInput("How frequently would you like the customers to buy tickets (sec) or type 0 to randomize it to each customer");
             int eventFrequency = validateUserInput("How frequently would you like an event to add tickets to the pool (sec) or type 0 to randomize it to each customer");
@@ -106,13 +106,36 @@ public class Util {
                 Vendor vendor = new Vendor(Util.generateRandomString("fname"), Util.generateRandomString("lname"), Util.generateRandomString("username"), Util.generateRandomString("password"), Util.generateRandomString("email"), true);
                 vendors.add(vendor);
             }
+            System.out.println("simulated events: " + simulatedEvents);
             for(int i = 0; i < simulatedEvents; i++){
-                Event event = new Event(Util.generateRandomInt(10000, 30000), Util.generateRandomInt(5000, 7000), Util.generateRandomInt(60000, 80000), Util.generateRandomSmallInt(5));
-                if(eventFrequency != 0){
-                    event.setFrequency(eventFrequency);
+                Event event = new Event(Util.generateRandomInt(10000, 30000), Util.generateRandomInt(60000, 80000));
+                if(eventFrequency == 0){
+                  ArrayList<Integer> vendorIdsAdded = new ArrayList<Integer>();
+                  int eventVendorCount;
+                  if(vendors.size() == 0){
+                      eventVendorCount = 1;
+                  }else{
+                      eventVendorCount = generateRandomInt(1, vendors.size());
+                  }
+                    System.out.println(i +". eventVendorCount: " + eventVendorCount);
+                  for(int j = 0; j < eventVendorCount; j++){
+                      int vendorId;
+                      if(vendors.size() == 0){
+                          vendorId = 1;
+                      }else{
+                          vendorId = generateRandomInt(1, vendors.size());
+                      }
+                      if(!vendorIdsAdded.contains(vendorId)){
+                          vendorIdsAdded.add(vendorId);
+                          int releaseRate = generateRandomInt(5000, 7000);
+                          int frequency = generateRandomSmallInt(60);
+                          event.addVendorEventAssociations(new VendorEventAssociation(vendors.get(vendorId - 1), event, releaseRate, frequency));
+                      }
+                  }
+
                 }
-                int vendorId = Util.generateRandomSmallInt(vendors.size() + 1);
-                vendors.get(vendorId - 1).setEvents(event);
+                int vendorId = Util.generateRandomInt(0, vendors.size());
+                vendors.get(vendorId).setEvents(event);
                 events.add(event);
                 event.setVendorId(vendorId);
             }

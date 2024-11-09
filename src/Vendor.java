@@ -10,6 +10,10 @@ public class Vendor extends User{
         this.vendorId = nextId++;
     }
 
+    public int getVendorId() {
+        return vendorId;
+    }
+
     public ArrayList<Event> getEvents() {
         return events;
     }

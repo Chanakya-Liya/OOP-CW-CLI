@@ -15,9 +15,8 @@ public class Event implements Runnable {
     private ArrayList<Ticket> soldTickets = new ArrayList<Ticket>();
     private ArrayList<Ticket> availableTickets = new ArrayList<Ticket>();
     private int poolSize;
-    private int releaseRate;
-    private int frequency;
     private int totalEventTickets;
+    private ArrayList<VendorEventAssociation> vendorEventAssociations = new ArrayList<VendorEventAssociation>();
     private static final Logger logger = Logger.getLogger(Event.class.getName());
 
     static {
@@ -38,11 +37,9 @@ public class Event implements Runnable {
         }
     }
 
-    public Event(int poolSize, int releaseRate, int totalEventTickets, int frequency) {
+    public Event(int poolSize, int totalEventTickets) {
         this.id = nextId++;
         this.poolSize = poolSize;
-        this.releaseRate = releaseRate;
-        this.frequency = frequency;
         this.totalEventTickets = totalEventTickets;
         floodTickets(poolTickets, "pool");
         floodTickets(availableTickets, "available");
@@ -62,6 +59,14 @@ public class Event implements Runnable {
                 this.availableTickets.add(ticket);
             }
         }
+    }
+
+    public ArrayList<VendorEventAssociation> getVendorEventAssociations() {
+        return vendorEventAssociations;
+    }
+
+    public void addVendorEventAssociations(VendorEventAssociation vendorEventAssociations) {
+        this.vendorEventAssociations.add(vendorEventAssociations);
     }
 
     public ArrayList<Ticket> getPoolTickets() {
@@ -88,24 +93,8 @@ public class Event implements Runnable {
         return poolSize;
     }
 
-    public int getReleaseRate() {
-        return releaseRate;
-    }
-
-    public int getFrequency() {
-        return frequency;
-    }
-
     public int getTotalEventTickets() {
         return totalEventTickets;
-    }
-
-    public void setFrequency(int frequency) {
-        this.frequency = frequency;
-    }
-
-    public void setReleaseRate(int releaseRate) {
-        this.releaseRate = releaseRate;
     }
 
     public void setVendorId(int vendorId) {
@@ -113,45 +102,20 @@ public class Event implements Runnable {
     }
 
     public void removeTicketFromPool(){
-        Ticket ticket = poolTickets.getFirst();
-        poolTickets.removeFirst();
+        Ticket ticket = poolTickets.get(0);
+        poolTickets.remove(0);
         soldTickets.add(ticket);
     }
 
-    public void addTicketsToPool(){
-        if(poolTickets.size() + releaseRate <= poolSize){
-            if(availableTickets.size() >= releaseRate){
-                for(int i = 0; i < releaseRate; i++){
-                    Ticket ticket = availableTickets.getFirst();
-                    poolTickets.add(ticket);
-                    availableTickets.removeFirst();
-                }
-            }else{
-                for(int i = 0; i < availableTickets.size(); i++){
-                    Ticket ticket = availableTickets.getFirst();
-                    poolTickets.add(ticket);
-                    availableTickets.removeFirst();
-                }
-            }
-        }
+    public boolean allTicketsSold(){
+        return poolTickets.isEmpty() && availableTickets.isEmpty();
     }
+
+
 
     @Override
     public void run(){
-        while(!availableTickets.isEmpty()){
-            try {
-                int before = this.poolTickets.size();
-                String stringBefore = toString();
-                addTicketsToPool();
-                int after = this.poolTickets.size();
-                if(before != after){
-                    logger.warning("\nBefore: " + stringBefore + "\nAfter: " + toString());
-                }
-                Thread.sleep(frequency * 1000L);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+
     }
 
     @Override
@@ -159,13 +123,12 @@ public class Event implements Runnable {
         return "Event{" +
                 "id=" + id +
                 ", vendorId=" + vendorId +
-                ", poolTickets=" + poolTickets.size() +
-                ", soldTickets=" + soldTickets.size() +
-                ", availableTickets=" + availableTickets.size() +
+                ", poolTickets=" + poolTickets +
+                ", soldTickets=" + soldTickets +
+                ", availableTickets=" + availableTickets +
                 ", poolSize=" + poolSize +
-                ", releaseRate=" + releaseRate +
-                ", frequency=" + frequency +
                 ", totalEventTickets=" + totalEventTickets +
+                ", vendorEventAssociations=" + vendorEventAssociations +
                 '}';
     }
 }
