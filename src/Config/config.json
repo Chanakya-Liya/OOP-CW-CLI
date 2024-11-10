@@ -1,22 +1,45 @@
 {
-  "event":{
-    "eventCount": 0,
-    "ticketPoolSize":0,
-    "releaseRate": 0,
-    "frequency": 0,
-    "randomEventCountMin": 20,
-    "randomEventCountMax": 45
+  "Simulation": {
+      "event":{
+        "EventCountMin": 20,
+        "EventCountMax": 45,
+        "PoolSizeMin": 10000,
+        "PoolSizeMax": 30000,
+        "TotalEventTicketsMin": 60000,
+        "TotalEventTicketsMax": 80000
+      },
+      "customer": {
+        "CustomerCountMin": 100,
+        "CustomerCountMax": 3000,
+        "RetrievalRateMin": 0,
+        "RetrievalRateMax": 50,
+        "FrequencyMin": 1,
+        "FrequencyMax": 30
+      },
+      "vendor": {
+        "VendorCountMin": 5,
+        "VendorCountMax": 15,
+        "ReleaseRateMin": 5000,
+        "ReleaseRateMax": 7000,
+        "FrequencyMin": 1,
+        "FrequencyMax": 60
+      }
   },
-  "customer": {
-    "customerCount": 0,
-    "retrievalRate": 0,
-    "frequency":  0,
-    "randomCustomerCountMin": 100,
-    "randomCustomerCountMax": 3000
-  },
-  "vendor": {
-    "vendorCount": 0,
-    "randomVendorCountMin": 5,
-    "randomVendorCountMax": 15
+  "ThreadTesting" : {
+     "event": {
+       "EventCount" : 10,
+       "PoolSize": 500,
+       "TotalTicketCount": 10000
+     },
+    "customer": {
+      "CustomerCount": 10,
+      "RetrievalRate": 50,
+      "Frequency": 1
+    },
+    "vendor": {
+      "VendorCount": 5,
+      "ReleaseRate": 4000,
+      "Frequency": 2
+    }
   }
 }
