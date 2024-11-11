@@ -1,118 +1,100 @@
-public class Event implements Runnable {
+import java.util.ArrayList;
+
+public class Event{
     private static int nextId = 1;
     private final int id;
-    private int vendorId;
-    private int poolTicketsAvailable; //tickets left in the ticket pool
-    private int ticketPoolSize; //ticket pool size
-    private int releaseRate;
-    private int frequency;
-    private int ticketsSold = 0;
-    private int totalEventTickets; //total number of tickets for the event
+    private Vendor vendor;
+    private ArrayList<Ticket> poolTickets = new ArrayList<Ticket>();
+    private ArrayList<Ticket> soldTickets = new ArrayList<Ticket>();
+    private ArrayList<Ticket> availableTickets = new ArrayList<Ticket>();
+    private final int poolSize;
+    private final int totalEventTickets;
+    private ArrayList<VendorEventAssociation> vendorEventAssociations = new ArrayList<VendorEventAssociation>();
 
-    public static final String GREEN = "\033[0;32m";
-    public static final String RESET = "\033[0m";
-
-    public Event(int ticketPoolSize, int releaseRate, int totalEventTickets, int frequency) {
+    public Event(int poolSize, int totalEventTickets) {
         this.id = nextId++;
-        this.poolTicketsAvailable = ticketPoolSize;
-        this.ticketPoolSize = ticketPoolSize + (2 * releaseRate);
-        this.releaseRate = releaseRate;
-        this.totalEventTickets = totalEventTickets + (2 * ticketPoolSize);
-        this.frequency = frequency;
+        this.poolSize = poolSize;
+        this.totalEventTickets = totalEventTickets;
+        floodTickets(poolTickets, "pool");
+        floodTickets(availableTickets, "available");
+    }
+
+    public void floodTickets(ArrayList<Ticket> tickets, String status){
+        if(status.equalsIgnoreCase("pool")){
+            for(int i = 0; i < poolSize; i++){
+                Ticket ticket = new Ticket();
+                ticket.setEventId(this.id);
+                this.poolTickets.add(ticket);
+            }
+        }else{
+            for(int i = 0; i < (totalEventTickets - poolSize); i++){
+                Ticket ticket = new Ticket();
+                ticket.setEventId(this.id);
+                this.availableTickets.add(ticket);
+            }
+        }
+    }
+
+    public ArrayList<VendorEventAssociation> getVendorEventAssociations() {
+        return vendorEventAssociations;
+    }
+
+    public void addVendorEventAssociations(VendorEventAssociation vendorEventAssociations) {
+        this.vendorEventAssociations.add(vendorEventAssociations);
+    }
+
+    public ArrayList<Ticket> getPoolTickets() {
+        return poolTickets;
+    }
+
+    public ArrayList<Ticket> getAvailableTickets() {
+        return availableTickets;
     }
 
     public int getId() {
         return id;
     }
 
-    public int getVendorId() {
-        return vendorId;
+    public Vendor getVendor() {
+        return vendor;
     }
 
-    public int getPoolTicketsAvailable() {
-        return poolTicketsAvailable;
+    public ArrayList<Ticket> getSoldTickets() {
+        return soldTickets;
     }
 
-    public void removeTicketFromPool(){
-        this.poolTicketsAvailable -= 1;
-        this.ticketsSold ++;
-    }
-
-    public int getTicketPoolSize() {
-        return ticketPoolSize;
-    }
-
-    public int getReleaseRate() {
-        return releaseRate;
-    }
-
-    public int getTicketsSold() {
-        return ticketsSold;
+    public int getPoolSize() {
+        return poolSize;
     }
 
     public int getTotalEventTickets() {
         return totalEventTickets;
     }
 
-    public void setTicketPoolSize(int ticketPoolSize) {
-        this.ticketPoolSize = ticketPoolSize;
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 
-    public void setReleaseRate(int releaseRate) {
-        this.releaseRate = releaseRate;
+    public void removeTicketFromPool(){
+        Ticket ticket = poolTickets.getFirst();
+        poolTickets.removeFirst();
+        soldTickets.add(ticket);
     }
 
-    public void setTotalEventTickets(int totalEventTickets) {
-        this.totalEventTickets = totalEventTickets;
+    public void addTicketToPool(){
+        Ticket ticket = availableTickets.getFirst();
+        poolTickets.add(ticket);
+        availableTickets.removeFirst();
     }
 
-    public void setPoolTicketsAvailable(int poolTicketsAvailable) {
-        this.poolTicketsAvailable = poolTicketsAvailable;
+    public boolean allTicketsSold(){
+        return poolTickets.isEmpty() && availableTickets.isEmpty();
     }
 
-    public void setTicketsSold(int ticketsSold) {
-        this.ticketsSold = ticketsSold;
-    }
-
-    public void setVendorId(int vendorId) {
-        this.vendorId = vendorId;
-    }
-
-    public int getFrequency() {
-        return frequency;
-    }
-
-    public void setFrequency(int frequency) {
-        this.frequency = frequency;
-    }
-
-    @Override
-    public void run(){
-        try {
-            System.out.println(GREEN + frequency + RESET);
-
-            while (totalEventTickets > ticketsSold) {
-                synchronized (this) {
-                    // Check if there’s room in the pool to release more tickets
-                    while (poolTicketsAvailable + releaseRate > ticketPoolSize) {
-                        // Wait if the pool is at capacity
-                        System.out.println(GREEN + toString() + "No SELL - Waiting" + RESET);
-                        wait();
-                    }
-
-                    // Add tickets to the pool
-                    poolTicketsAvailable += releaseRate;
-                    System.out.println(GREEN + toString() + " Released Tickets" + RESET);
-
-                    // Notify other threads in case they're waiting to purchase tickets
-                    notifyAll();
-                }
-
-                // Only sleep for pacing; this will not block other threads since it's outside synchronized
-                Thread.sleep(frequency * 1000L);
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+    public void startVendorThreads() {
+        for (VendorEventAssociation association : vendorEventAssociations) {
+            Thread thread = new Thread(association);
+            thread.start();
         }
     }
 
@@ -120,13 +102,13 @@ public class Event implements Runnable {
     public String toString() {
         return "Event{" +
                 "id=" + id +
-                ", vendorId=" + vendorId +
-                ", poolTicketsAvailable=" + poolTicketsAvailable +
-                ", ticketPoolSize=" + ticketPoolSize +
-                ", releaseRate=" + releaseRate +
-                ", frequency=" + frequency +
-                ", ticketsSold=" + ticketsSold +
+                ", vendor=" + vendor.getVendorId() +
+                ", poolTickets=" + poolTickets.size() +
+                ", soldTickets=" + soldTickets.size() +
+                ", availableTickets=" + availableTickets.size() +
+                ", poolSize=" + poolSize +
                 ", totalEventTickets=" + totalEventTickets +
+                ", vendorEventAssociations=" + vendorEventAssociations +
                 '}';
     }
 }

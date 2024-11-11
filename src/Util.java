@@ -1,14 +1,52 @@
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Util {
-    private static ArrayList<Customer> customers = new ArrayList<Customer>();
-    private static ArrayList<Vendor> vendors = new ArrayList<Vendor>();
-    private static ArrayList<Event> events = new ArrayList<Event>();
+    private final static ArrayList<Customer> customers = new ArrayList<Customer>();
+    private final static ArrayList<Vendor> vendors = new ArrayList<Vendor>();
+    private final static ArrayList<Event> events = new ArrayList<Event>();
+    private static final String DirectoryPath = "src/Logs/"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd _ HH-mm-ss"));
+    private static final String CustomerLog = DirectoryPath + File.separator +"/customer.log";;
+    private static final String EventLog = DirectoryPath + File.separator +"/event.log";
+    private static final String VendorLog =DirectoryPath + File.separator +"/vendor.log";;
+    private static final String simulationLog = DirectoryPath + File.separator +"/simulation.log";;
+    private static final Logger logger = Logger.getLogger(Util.class.getName());
+    private static int startOption;
+
+    static {
+        try {
+            File directory = new File(DirectoryPath);
+            if (directory.mkdir()) {
+                System.out.println("Directory created successfully.");
+            } else {
+                System.out.println("Failed to create directory.");
+
+            }
+            FileHandler fileHandler = new FileHandler(simulationLog, true); // "true" to append to the file
+            fileHandler.setFormatter(new SimpleFormatter());  // Sets a simple text format for logs
+            logger.addHandler(fileHandler);
+            logger.setUseParentHandlers(false); // Disables logging to console
+        } catch (IOException e) {
+            logger.warning("Failed to set up file handler for logger: " + e.getMessage());
+        }catch(InvalidPathException e){
+            logger.warning("Failed to set up file handler for logger hehe: " + e.getMessage());
+        }
+    }
 
     public static ArrayList<Customer> getCustomers() {
         return customers;
@@ -20,6 +58,22 @@ public class Util {
 
     public static ArrayList<Event> getEvents() {
         return events;
+    }
+
+    public static String getCustomerLog() {
+        return CustomerLog;
+    }
+
+    public static String getEventLog() {
+        return EventLog;
+    }
+
+    public static String getVendorLog() {
+        return VendorLog;
+    }
+
+    public static int getStartOption() {
+        return startOption;
     }
 
     public static String generateRandomString(String stringRequired) throws IOException {
@@ -59,64 +113,242 @@ public class Util {
         return null;
     }
 
-    public static int generateRandomSmallInt(int range){
-        if(range == 1){
-            return 1;
-        }
-        Random random = new Random();
-        return random.nextInt(1, range);
-    }
-
     public static int generateRandomInt(int start, int end){
+        if(start == end){
+            return end;
+        }
         Random random = new Random();
         return random.nextInt(start, end);
     }
 
     public static void generateSimulatedUsers(){
         try {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Welcome");
-            System.out.print("How many Customers would you like to simulate: ");
-            int simulateCustomers = scanner.nextInt();
-            System.out.print("How many Vendors would you like to simulate: ");
-            int simulateVendors = scanner.nextInt();
-            System.out.print("How many events would you like to simulate: ");
-            int simulatedEvents= scanner.nextInt();
-            System.out.print("How many tickets would you like the customers to buy per frequency(ticket amount) or type 0 to randomize it to each customer: ");
-            int customerRetrieve = scanner.nextInt();
-            System.out.print("How frequently would you like the customers to buy tickets (sec) or type 0 to randomize it to each customer: ");
-            int customerFrequency = scanner.nextInt();
-            System.out.print("How frequently would you like an event to add tickets to the pool (sec) or type 0 to randomize it to each customer: ");
-            int eventFrequency = scanner.nextInt();
+            System.out.println("Welcome to the ticket vendor simulation CLI");
+            System.out.println("Make sure you have altered the config file to your liking before starting");
+            System.out.println("Please select one of the following");
+            System.out.println("1. Simulation");
+            System.out.println("2. Thread Testing");
+            System.out.println("3. Exit");
+            startOption = validateUserInput("Option", 1 , 3);
 
-            for(int i = 0; i < simulateCustomers; i++){
-                Customer customer = new Customer(Util.generateRandomString("fname"), Util.generateRandomString("lname"), Util.generateRandomString("username"), Util.generateRandomString("password"), Util.generateRandomString("email"), true, Util.generateRandomSmallInt(50), Util.generateRandomSmallInt(30));
-                if(customerFrequency != 0){
-                    customer.setFrequency(customerFrequency);
-                }
-                if(customerRetrieve != 0){
-                    customer.setRetrievalRate(customerRetrieve);
-                }
-                customers.add(customer);
-            }
-            for(int i = 0; i < simulateVendors; i++){
-                Vendor vendor = new Vendor(Util.generateRandomString("fname"), Util.generateRandomString("lname"), Util.generateRandomString("username"), Util.generateRandomString("password"), Util.generateRandomString("email"), true);
-                vendors.add(vendor);
-            }
-            for(int i = 0; i < simulatedEvents; i++){
-                Event event = new Event(Util.generateRandomInt(10000, 30000), Util.generateRandomSmallInt(4000), Util.generateRandomInt(100000, 1000000), Util.generateRandomSmallInt(60));
-                if(eventFrequency != 0){
-                    event.setFrequency(eventFrequency);
-                }
-                int vendorId = Util.generateRandomSmallInt(vendors.size() + 1);
-                vendors.get(vendorId - 1).setEvents(event);
-                events.add(event);
-                event.setVendorId(vendorId);
+            if(startOption == 1){
+                generateForSimulation(true);
+            }else if(startOption == 2){
+                generateForThreadTesting();
+
+            }else if(startOption == 3){
+                System.out.println("Exiting Program");
+                System.exit(1);
             }
 
         } catch (Exception e) {
             System.out.println("fuck");
             System.out.println(e);
+        }
+    }
+
+    public static void generateForSimulation(boolean isStartUp) throws IOException {
+        int EventCountMin = readJsonFile("Simulation", "event", "EventCountMin");
+        int EventCountMax = readJsonFile("Simulation", "event", "EventCountMax");
+        int PoolSizeMin = readJsonFile("Simulation", "event", "PoolSizeMin");
+        int PoolSizeMax = readJsonFile("Simulation", "event", "PoolSizeMax");
+        int TotalEventTicketsMin = readJsonFile("Simulation", "event", "TotalEventTicketsMin");
+        int TotalEventTicketsMax = readJsonFile("Simulation", "event", "TotalEventTicketsMax");
+
+        int CustomerCountMin = readJsonFile("Simulation", "customer", "CustomerCountMin");
+        int CustomerCountMax = readJsonFile("Simulation", "customer", "CustomerCountMax");
+        int RetrievalRateMin = readJsonFile("Simulation", "customer", "RetrievalRateMin");
+        int RetrievalRateMax = readJsonFile("Simulation", "customer", "RetrievalRateMax");
+        int CustomerFrequencyMin = readJsonFile("Simulation", "customer", "FrequencyMin");
+        int CustomerFrequencyMax = readJsonFile("Simulation", "customer", "FrequencyMax");
+
+        int VendorCountMin = readJsonFile("Simulation", "vendor", "VendorCountMin");
+        int VendorCountMax = readJsonFile("Simulation", "vendor", "VendorCountMax");
+        int ReleaseRateMin = readJsonFile("Simulation", "vendor", "ReleaseRateMin");
+        int ReleaseRateMax = readJsonFile("Simulation", "vendor", "ReleaseRateMax");
+        int VendorFrequencyMin = readJsonFile("Simulation", "vendor", "FrequencyMin");
+        int VendorFrequencyMax = readJsonFile("Simulation", "vendor", "FrequencyMax");
+
+        int simulatedVendors = generateRandomInt(VendorCountMin, VendorCountMax);
+        int simulatedCustomers = generateRandomInt(CustomerCountMin, CustomerCountMax);
+        int simulatedEvents = generateRandomInt(EventCountMin, EventCountMax);
+
+        if(!isStartUp){
+            simulatedEvents = 1;
+        }else{
+            simulateCustomersForSimulationTesting(simulatedCustomers, RetrievalRateMin, RetrievalRateMax, CustomerFrequencyMin, CustomerFrequencyMax);
+            simulateVendors(simulatedVendors);
+        }
+        simulateEventsForSimulationTesting(simulatedEvents, PoolSizeMin, PoolSizeMax,TotalEventTicketsMin, TotalEventTicketsMax, ReleaseRateMin, ReleaseRateMax, VendorFrequencyMin, VendorFrequencyMax);
+    }
+
+    public static void generateForThreadTesting() throws IOException {
+        int simulatedEvents = readJsonFile("ThreadTesting", "event", "EventCount");
+        int PoolSize = readJsonFile("ThreadTesting", "event", "PoolSize");
+        int TotalEventTickets = readJsonFile("ThreadTesting", "event", "TotalTicketCount");
+
+        int simulatedCustomers = readJsonFile("ThreadTesting", "customer", "CustomerCount");
+        int RetrievalRate = readJsonFile("ThreadTesting", "customer", "RetrievalRate");;
+        int CustomerFrequency = readJsonFile("ThreadTesting", "customer", "Frequency");
+
+        int simulatedVendors = readJsonFile("ThreadTesting", "vendor", "VendorCount");
+        int ReleaseRate = readJsonFile("ThreadTesting", "vendor", "ReleaseRate");
+        int VendorFrequency = readJsonFile("ThreadTesting", "vendor", "Frequency");
+
+        simulateCustomersForThreadTesting(simulatedCustomers, CustomerFrequency, RetrievalRate);
+        simulateVendors(simulatedVendors);
+        simulateEventsForThreadTesting(simulatedEvents, PoolSize, TotalEventTickets, ReleaseRate, VendorFrequency);
+    }
+
+    public static int validateUserInput(String prompt, int min, int max){
+        Scanner scanner = new Scanner(System.in);
+        int option = -1;
+
+        System.out.printf("%s: ", prompt);
+
+        while (true) {
+            try {
+                option = scanner.nextInt();
+
+                if (option >= min && option <= max) {
+                    break;
+                } else {
+                    System.out.printf("Invalid input. Please enter a number between %d and %d: ", min, max);
+                }
+            } catch (InputMismatchException e) {
+                System.out.print("Invalid input. Please enter a valid integer: ");
+                scanner.nextLine();
+            }
+        }
+        return option;
+    }
+
+    public static void simulateCustomersForThreadTesting(int simulateCustomers, int customerFrequency, int customerRetrieve) throws IOException {
+        for(int i = 0; i < simulateCustomers; i++){
+            Customer customer = new Customer(Util.generateRandomString("fname"), Util.generateRandomString("lname"), Util.generateRandomString("username"), Util.generateRandomString("password"), Util.generateRandomString("email"), true, customerRetrieve, customerFrequency);
+            customers.add(customer);
+        }
+    }
+
+    public static void simulateCustomersForSimulationTesting(int simulateCustomers, int customerRetrieveMin, int customerRetrieveMax, int customerFrequencyMin, int customerFrequencyMax) throws IOException {
+        for(int i = 0; i < simulateCustomers; i++){
+            Customer customer = new Customer(Util.generateRandomString("fname"), Util.generateRandomString("lname"), Util.generateRandomString("username"), Util.generateRandomString("password"), Util.generateRandomString("email"), true, Util.generateRandomInt(customerRetrieveMin, customerRetrieveMax), Util.generateRandomInt(customerFrequencyMin, customerFrequencyMax));
+            customers.add(customer);
+        }
+    }
+
+    public static void simulateVendors(int simulateVendors) throws IOException {
+        for(int i = 0; i < simulateVendors; i++){
+            Vendor vendor = new Vendor(Util.generateRandomString("fname"), Util.generateRandomString("lname"), Util.generateRandomString("username"), Util.generateRandomString("password"), Util.generateRandomString("email"), true);
+            vendors.add(vendor);
+        }
+    }
+
+    public static void simulateEventsForThreadTesting(int simulatedEvent, int poolSize, int totalEventTickets, int releaseRate, int frequency){
+        for(int i = 0; i < simulatedEvent; i++){
+            boolean flag = true;
+            Event event = new Event(poolSize, totalEventTickets);
+            int vendorCount = generateRandomInt(-5,vendors.size());
+            ArrayList<Integer> addedVendors = new ArrayList<Integer>();
+            if(vendorCount <= 0){
+                vendorCount = 1;
+            }
+            for(int j = 0; j < vendorCount; j++){
+                int vendorPosition;
+                do{
+                     vendorPosition = generateRandomInt(0,vendors.size());
+                }while(addedVendors.contains(vendorPosition));
+
+                if(flag){
+                   event.setVendor(vendors.get(vendorPosition));
+                }
+                VendorEventAssociation vendorEventAssociation = new VendorEventAssociation(vendors.get(vendorPosition), event, releaseRate, frequency);
+                event.addVendorEventAssociations(vendorEventAssociation);
+                vendors.get(vendorPosition).setEvents(event);
+                addedVendors.add(vendorPosition);
+                flag = false;
+            }
+            events.add(event);
+        }
+    }
+
+    public static void simulateEventsForSimulationTesting(int simulatedEvent, int poolSizeMin, int poolSizeMax, int totalEventTicketsMin, int totalEventTicketsMax, int releaseRateMin, int releaseRateMax, int frequencyMin, int frequencyMax){
+        for(int i = 0; i < simulatedEvent; i++){
+            boolean flag = true;
+            Event event = new Event(generateRandomInt(poolSizeMin, poolSizeMax), generateRandomInt(totalEventTicketsMin, totalEventTicketsMax));
+            int vendorCount = generateRandomInt(-5,vendors.size());
+            ArrayList<Integer> addedVendors = new ArrayList<Integer>();
+            if(vendorCount <= 0){
+                vendorCount = 1;
+            }
+            for(int j = 0; j < vendorCount; j++){
+                int vendorPosition;
+                do{
+                    vendorPosition = generateRandomInt(0,vendors.size());
+                }while(addedVendors.contains(vendorPosition));
+
+                if(flag){
+                    event.setVendor(vendors.get(vendorPosition));
+                }
+                VendorEventAssociation vendorEventAssociation = new VendorEventAssociation(vendors.get(vendorPosition), event, generateRandomInt(releaseRateMin, releaseRateMax), generateRandomInt(frequencyMin, frequencyMax));
+                event.addVendorEventAssociations(vendorEventAssociation);
+                vendors.get(vendorPosition).setEvents(event);
+                addedVendors.add(vendorPosition);
+                flag = false;
+            }
+            events.add(event);
+        }
+    }
+
+    public static int readJsonFile(String type, String option ,String config) {
+        try (FileReader reader = new FileReader("src/Config/config.json")) {
+            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+            return root.getAsJsonObject(type).getAsJsonObject(option).get(config).getAsInt();
+        } catch (IOException e) {
+            return 0;
+        }
+    }
+
+    public static void endProgram(){
+        System.out.println("1. Exit Program");
+        System.out.println("2. To View All Events");
+        System.out.println("3. To View All Vendors");
+        System.out.println("4. To View All Customers");
+        while(true){
+            System.out.println("5. To View All Options");
+            int option = validateUserInput("option", 1, 5);
+            if(option == 1){
+                for(Customer customer : customers){
+                    logger.info(customer.toString());
+                }
+                logger.info("==================================================");
+                for(Vendor vendor : vendors){
+                    logger.info(vendor.toString());
+                }
+                logger.info("==================================================");
+                for(Event event : events) {
+                    logger.info(event.toString());
+                }
+                System.exit(1);
+            } else if (option == 2) {
+                for(Event event : events){
+                    System.out.println(event.toString());
+                }
+            }else if(option == 3){
+                for(Vendor vendor: vendors){
+                    System.out.println(vendor.toString());
+                }
+            } else if (option == 4) {
+                for(Customer customer : customers){
+                    System.out.println(customer.toString());
+                }
+            }else if(option == 5){
+                System.out.println("1. Exit Program");
+                System.out.println("2. To View All Events");
+                System.out.println("3. To View All Vendors");
+                System.out.println("4. To View All Customers");
+            }
+
         }
     }
 }
