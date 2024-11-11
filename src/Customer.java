@@ -48,12 +48,17 @@ public class Customer extends User implements Runnable {
         this.retrievalRate = retrievalRate;
     }
 
-    @Override
-    public void run(){
+    public int getTotalTicket(){
         int totalTickets = 0;
         for(Event event : Util.getEvents()){
             totalTickets += event.getTotalEventTickets();
         }
+        return totalTickets;
+    }
+
+    @Override
+    public void run(){
+        int totalTickets = getTotalTicket();
         while(totalTickets > 0){
             try {
                 for(int i = 0; i < retrievalRate; i++){
@@ -61,25 +66,24 @@ public class Customer extends User implements Runnable {
                     while(flag) {
                         int eventId = Util.generateRandomInt(0, Util.getEvents().size());
                         Event selectedEvent = Util.getEvents().get(eventId);
+                        String messageTemplate = "event id: %d ticket sold customer with id: %d, available tickets: %d";
                         synchronized (selectedEvent){
                             if(!Util.getEvents().get(eventId).getPoolTickets().isEmpty()){
                                 Util.getEvents().get(eventId).removeTicketFromPool();
-                                logger.info(String.format("event id: %d ticket sold customer with id: %d, available tickets: %d", Util.getEvents().get(eventId).getId(), CustomerId, Util.getEvents().get(eventId).getPoolTickets().size()));
-                                System.out.println(String.format("event id: %d ticket sold customer with id: %d, available tickets: %d", Util.getEvents().get(eventId).getId(), CustomerId, Util.getEvents().get(eventId).getPoolTickets().size()));
+                                String message = String.format(messageTemplate, Util.getEvents().get(eventId).getId(), CustomerId, Util.getEvents().get(eventId).getPoolTickets().size());
+                                logger.info(message);
                                 flag = false;
-                                totalTickets--;
                             }
                         }
                     }
                 }
                 Thread.sleep(frequency * 1000L);
+                totalTickets = getTotalTicket();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
     }
-
-
 
     @Override
     public String toString() {

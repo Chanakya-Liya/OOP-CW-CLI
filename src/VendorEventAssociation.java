@@ -84,9 +84,6 @@ public class VendorEventAssociation implements Runnable {
                 return;
             }
         }
-        synchronized (this){
-            System.out.println("Vendor " + vendor.getVendorId() + " completed ticket addition for Event " + event.getId());
-        }
     }
 
     @Override

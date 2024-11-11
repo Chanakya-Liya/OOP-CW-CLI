@@ -7,17 +7,20 @@ public class Main {
         Util.generateSimulatedUsers();
 
         for(Customer customer : Util.getCustomers()){
-            Thread custoemrThread = new Thread(customer);
-            custoemrThread.start();
+            Thread customerThread = new Thread(customer);
+            customerThread.start();
         }
 
         for(Event event : Util.getEvents()){
-            event.startVendorThreads();
+           event.startVendorThreads();
         }
 
         for(Vendor vendor : Util.getVendors()){
-
+            Thread vendorThread = new Thread(vendor);
+            vendorThread.start();
         }
         System.out.println("Simulation Running");
+
+        Util.endProgram();
     }
 }
