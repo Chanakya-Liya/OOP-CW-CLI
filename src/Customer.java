@@ -58,8 +58,7 @@ public class Customer extends User implements Runnable {
 
     @Override
     public void run(){
-        int totalTickets = getTotalTicket();
-        while(totalTickets > 0){
+        while(getTotalTicket() > 0){
             try {
                 for(int i = 0; i < retrievalRate; i++){
                     boolean flag = true;
@@ -78,7 +77,6 @@ public class Customer extends User implements Runnable {
                     }
                 }
                 Thread.sleep(frequency * 1000L);
-                totalTickets = getTotalTicket();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

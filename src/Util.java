@@ -315,7 +315,7 @@ public class Util {
         System.out.println("3. To View All Vendors");
         System.out.println("4. To View All Customers");
         while(true){
-            System.out.println("5. To View All Options");
+            System.out.println("\n5. To View All Options");
             int option = validateUserInput("option", 1, 5);
             if(option == 1){
                 for(Customer customer : customers){
