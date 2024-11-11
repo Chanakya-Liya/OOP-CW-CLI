@@ -1,48 +1,19 @@
-import java.io.IOException;
-import java.nio.file.InvalidPathException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
-public class Event implements Runnable {
+public class Event{
     private static int nextId = 1;
-    private int id;
-    private int vendorId;
+    private final int id;
+    private Vendor vendor;
     private ArrayList<Ticket> poolTickets = new ArrayList<Ticket>();
     private ArrayList<Ticket> soldTickets = new ArrayList<Ticket>();
     private ArrayList<Ticket> availableTickets = new ArrayList<Ticket>();
-    private int poolSize;
-    private int releaseRate;
-    private int frequency;
-    private int totalEventTickets;
-    private static final Logger logger = Logger.getLogger(Event.class.getName());
+    private final int poolSize;
+    private final int totalEventTickets;
+    private ArrayList<VendorEventAssociation> vendorEventAssociations = new ArrayList<VendorEventAssociation>();
 
-    static {
-        try {
-            LocalDateTime currentDateTime = LocalDateTime.now();
-            // Configure the logger with a FileHandler and SimpleFormatter
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd _ HH-mm-ss");
-            String formattedDateTime = currentDateTime.format(formatter);
-            String filePath = "src/Logs/" + formattedDateTime + "-event.log";
-            FileHandler fileHandler = new FileHandler(filePath, true); // "true" to append to the file
-            fileHandler.setFormatter(new SimpleFormatter());  // Sets a simple text format for logs
-            logger.addHandler(fileHandler);
-            logger.setUseParentHandlers(false); // Disables logging to console
-        } catch (IOException e) {
-            logger.warning("Failed to set up file handler for logger: " + e.getMessage());
-        }catch(InvalidPathException e){
-            logger.warning("Failed to set up file handler for logger hehe: " + e.getMessage());
-        }
-    }
-
-    public Event(int poolSize, int releaseRate, int totalEventTickets, int frequency) {
+    public Event(int poolSize, int totalEventTickets) {
         this.id = nextId++;
         this.poolSize = poolSize;
-        this.releaseRate = releaseRate;
-        this.frequency = frequency;
         this.totalEventTickets = totalEventTickets;
         floodTickets(poolTickets, "pool");
         floodTickets(availableTickets, "available");
@@ -64,6 +35,14 @@ public class Event implements Runnable {
         }
     }
 
+    public ArrayList<VendorEventAssociation> getVendorEventAssociations() {
+        return vendorEventAssociations;
+    }
+
+    public void addVendorEventAssociations(VendorEventAssociation vendorEventAssociations) {
+        this.vendorEventAssociations.add(vendorEventAssociations);
+    }
+
     public ArrayList<Ticket> getPoolTickets() {
         return poolTickets;
     }
@@ -76,8 +55,8 @@ public class Event implements Runnable {
         return id;
     }
 
-    public int getVendorId() {
-        return vendorId;
+    public Vendor getVendor() {
+        return vendor;
     }
 
     public ArrayList<Ticket> getSoldTickets() {
@@ -88,28 +67,12 @@ public class Event implements Runnable {
         return poolSize;
     }
 
-    public int getReleaseRate() {
-        return releaseRate;
-    }
-
-    public int getFrequency() {
-        return frequency;
-    }
-
     public int getTotalEventTickets() {
         return totalEventTickets;
     }
 
-    public void setFrequency(int frequency) {
-        this.frequency = frequency;
-    }
-
-    public void setReleaseRate(int releaseRate) {
-        this.releaseRate = releaseRate;
-    }
-
-    public void setVendorId(int vendorId) {
-        this.vendorId = vendorId;
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 
     public void removeTicketFromPool(){
@@ -118,39 +81,20 @@ public class Event implements Runnable {
         soldTickets.add(ticket);
     }
 
-    public void addTicketsToPool(){
-        if(poolTickets.size() + releaseRate <= poolSize){
-            if(availableTickets.size() >= releaseRate){
-                for(int i = 0; i < releaseRate; i++){
-                    Ticket ticket = availableTickets.getFirst();
-                    poolTickets.add(ticket);
-                    availableTickets.removeFirst();
-                }
-            }else{
-                for(int i = 0; i < availableTickets.size(); i++){
-                    Ticket ticket = availableTickets.getFirst();
-                    poolTickets.add(ticket);
-                    availableTickets.removeFirst();
-                }
-            }
-        }
+    public void addTicketToPool(){
+        Ticket ticket = availableTickets.getFirst();
+        poolTickets.add(ticket);
+        availableTickets.removeFirst();
     }
 
-    @Override
-    public void run(){
-        while(!availableTickets.isEmpty()){
-            try {
-                int before = this.poolTickets.size();
-                String stringBefore = toString();
-                addTicketsToPool();
-                int after = this.poolTickets.size();
-                if(before != after){
-                    logger.warning("\nBefore: " + stringBefore + "\nAfter: " + toString());
-                }
-                Thread.sleep(frequency * 1000L);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+    public boolean allTicketsSold(){
+        return poolTickets.isEmpty() && availableTickets.isEmpty();
+    }
+
+    public void startVendorThreads() {
+        for (VendorEventAssociation association : vendorEventAssociations) {
+            Thread thread = new Thread(association);
+            thread.start();
         }
     }
 
@@ -158,14 +102,13 @@ public class Event implements Runnable {
     public String toString() {
         return "Event{" +
                 "id=" + id +
-                ", vendorId=" + vendorId +
+                ", vendor=" + vendor.getVendorId() +
                 ", poolTickets=" + poolTickets.size() +
                 ", soldTickets=" + soldTickets.size() +
                 ", availableTickets=" + availableTickets.size() +
                 ", poolSize=" + poolSize +
-                ", releaseRate=" + releaseRate +
-                ", frequency=" + frequency +
                 ", totalEventTickets=" + totalEventTickets +
+                ", vendorEventAssociations=" + vendorEventAssociations +
                 '}';
     }
 }

@@ -1,16 +1,26 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Util.generateSimulatedUsers();
-        for(int i = 0; i < Util.getCustomers().size(); i++){
-            Thread customerThread = new Thread(Util.getCustomers().get(i));
+
+        for(Customer customer : Util.getCustomers()){
+            Thread customerThread = new Thread(customer);
             customerThread.start();
         }
 
-        for(int i = 0; i < Util.getEvents().size(); i++){
-            Thread eventThread = new Thread(Util.getEvents().get(i));
-            eventThread.start();
-          }
+        for(Event event : Util.getEvents()){
+           event.startVendorThreads();
+        }
+
+        for(Vendor vendor : Util.getVendors()){
+            Thread vendorThread = new Thread(vendor);
+            vendorThread.start();
+        }
+        System.out.println("Simulation Running");
+
+        Util.endProgram();
     }
 }
