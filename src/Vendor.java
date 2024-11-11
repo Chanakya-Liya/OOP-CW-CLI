@@ -85,7 +85,7 @@ public class Vendor extends User implements Runnable{
         return "Vendor{" +
                 "eventIds=" + eventIdBuilder +
                 ", id=" + vendorId +
-                "Event Creation Frequency=" + eventCreationFrequency +
+                ", Event Creation Frequency=" + eventCreationFrequency +
                 "} " + super.toString();
     }
 }
