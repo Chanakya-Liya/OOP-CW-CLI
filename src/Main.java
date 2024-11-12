@@ -12,7 +12,7 @@ public class Main {
         }
 
         for(Event event : Util.getEvents()){
-           event.startVendorThreads();
+            event.startVendorThreads();
         }
 
         for(Vendor vendor : Util.getVendors()){
