@@ -256,11 +256,11 @@ public class Util {
             for(int j = 0; j < vendorCount; j++){
                 int vendorPosition;
                 do{
-                     vendorPosition = generateRandomInt(0,vendors.size());
+                    vendorPosition = generateRandomInt(0,vendors.size());
                 }while(addedVendors.contains(vendorPosition));
 
                 if(flag){
-                   event.setVendor(vendors.get(vendorPosition));
+                    event.setVendor(vendors.get(vendorPosition));
                 }
                 VendorEventAssociation vendorEventAssociation = new VendorEventAssociation(vendors.get(vendorPosition), event, releaseRate, frequency);
                 event.addVendorEventAssociations(vendorEventAssociation);
@@ -315,7 +315,7 @@ public class Util {
         System.out.println("3. To View All Vendors");
         System.out.println("4. To View All Customers");
         while(true){
-            System.out.println("\n5. To View All Options");
+            System.out.println("5. To View All Options");
             int option = validateUserInput("option", 1, 5);
             if(option == 1){
                 for(Customer customer : customers){
