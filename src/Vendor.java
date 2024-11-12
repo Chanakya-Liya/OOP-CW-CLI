@@ -59,6 +59,7 @@ public class Vendor extends User implements Runnable{
                 }
                 Util.getEvents().getLast().setVendor(this);
                 logger.info("New Event Created by Vendor:" + this.vendorId + " event: " + Util.getEvents().getLast());
+                Util.getEvents().getLast().startVendorThreads();
             }catch (IOException e){
                 logger.warning("Error occurred while trying to create an event: " + e);
             }
