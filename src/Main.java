@@ -1,9 +1,11 @@
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 
-public class Main {
+public class Main{
     public static void main(String[] args) throws InterruptedException {
+        Util.validateConfig();
         Util.generateSimulatedUsers();
 
         for(Customer customer : Util.getCustomers()){
