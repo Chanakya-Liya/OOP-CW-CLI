@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
-public class Main implements Serializable {
+public class Main{
     public static void main(String[] args) throws InterruptedException {
         Util.validateConfig();
         Util.generateSimulatedUsers();
