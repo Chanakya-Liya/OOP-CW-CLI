@@ -263,7 +263,6 @@ public class Util {
                     event.setVendor(vendors.get(vendorPosition));
                 }
                 VendorEventAssociation vendorEventAssociation = new VendorEventAssociation(vendors.get(vendorPosition), event, releaseRate, frequency);
-                event.addVendorEventAssociations(vendorEventAssociation);
                 vendors.get(vendorPosition).setEvents(event);
                 addedVendors.add(vendorPosition);
                 flag = false;
@@ -291,9 +290,10 @@ public class Util {
                     event.setVendor(vendors.get(vendorPosition));
                 }
                 VendorEventAssociation vendorEventAssociation = new VendorEventAssociation(vendors.get(vendorPosition), event, generateRandomInt(releaseRateMin, releaseRateMax), generateRandomInt(frequencyMin, frequencyMax));
-                event.addVendorEventAssociations(vendorEventAssociation);
                 vendors.get(vendorPosition).setEvents(event);
                 addedVendors.add(vendorPosition);
+                Thread eventThread = new Thread(vendorEventAssociation);
+                eventThread.start();
                 flag = false;
             }
             events.add(event);
@@ -407,12 +407,11 @@ public class Util {
     }
 
     public static void endProgram(){
-        System.out.println("1. Exit Program");
-        System.out.println("2. To View All Events");
-        System.out.println("3. To View All Vendors");
-        System.out.println("4. To View All Customers");
         while(true){
-            System.out.println("\n5. To View All Options");
+            System.out.println("1. Exit Program");
+            System.out.println("2. To View All Events");
+            System.out.println("3. To View All Vendors");
+            System.out.println("4. To View All Customers");
             int option = validateUserInput("option", 1, 4);
 
             if(option == 1){
@@ -440,11 +439,6 @@ public class Util {
                 for(Customer customer : customers){
                     System.out.println(customer.toString());
                 }
-            }else if(option == 5){
-                System.out.println("1. Exit Program");
-                System.out.println("2. To View All Events");
-                System.out.println("3. To View All Vendors");
-                System.out.println("4. To View All Customers");
             }
         }
     }

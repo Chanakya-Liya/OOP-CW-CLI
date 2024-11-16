@@ -1,12 +1,16 @@
+
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+
 public class VendorEventAssociation implements Runnable {
-    private final Vendor vendor;
-    private final Event event;
+
+    private long associationId;
+    private Vendor vendor;
+    private Event event;
     private int releaseRate;
     private int frequency;
     private static final Logger logger = Logger.getLogger(VendorEventAssociation.class.getName());
@@ -31,6 +35,8 @@ public class VendorEventAssociation implements Runnable {
         this.releaseRate = releaseRate;
         this.frequency = frequency;
     }
+
+    public VendorEventAssociation() {}
 
     public Vendor getVendor() {
         return vendor;
@@ -69,9 +75,9 @@ public class VendorEventAssociation implements Runnable {
                             event.addTicketToPool();
                         }
                         int after = event.getPoolTickets().size();
-                        logger.info("Vendor " + vendor.getVendorId() +
+                        logger.info("Vendor " + vendor.getId() +
                                 " added " + added + " tickets to Event " + event.getId() +
-                                ". Pool size: " + event.getPoolTickets().size() + " before: " + before + " after: " + after + " available tickets: " + event.getAvailableTickets().size());
+                                ". Pool size: " + event.getPoolSize() + " before: " + before + " after: " + after + " available tickets: " + event.getAvailableTickets().size());
                     }
                 }
                 // Sleep for the specified frequency before the next addition cycle
@@ -79,7 +85,7 @@ public class VendorEventAssociation implements Runnable {
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                logger.warning("VendorEventAssociation for Vendor " + vendor.getVendorId() +
+                logger.warning("VendorEventAssociation for Vendor " + vendor.getId() +
                         " interrupted: " + e.getMessage());
                 return;
             }
@@ -89,7 +95,7 @@ public class VendorEventAssociation implements Runnable {
     @Override
     public String toString() {
         return "VendorEventAssociation{" +
-                "vendor=" + vendor.getVendorId() +
+                "vendor=" + vendor.getId() +
                 ", event=" + event.getId() +
                 ", releaseRate=" + releaseRate +
                 ", frequency=" + frequency +

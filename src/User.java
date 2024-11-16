@@ -1,32 +1,36 @@
+
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
 
 abstract class User {
     private static int nextId = 1;
-    private final int id;
-    private final String fName;
-    private final String lName;
+    private int id;
+    private String fName;
+    private  String lName;
     private String username;
     private String password;
     private String email;
-    private final boolean simulated;
+    private boolean simulated;
     private static final Logger logger = Logger.getLogger(User.class.getName());
 
     public User(String fName, String lName, String username, String password, String email, boolean simulated) {
-            id = nextId++;
-            this.fName = fName;
-            this.lName = lName;
-            this.username = username;
-            this.email = email;
-            this.simulated = simulated;
-            if(isValidPassword(password) || simulated){
-                this.password = hashPassword(password);
-            }else{
-                logger.warning("Make sure your password is at least 10 characters long and contain letters and numbers");
-                throw new IllegalArgumentException();
-            }
+        id = nextId++;
+        this.fName = fName;
+        this.lName = lName;
+        this.username = username;
+        this.email = email;
+        this.simulated = simulated;
+        if(isValidPassword(password) || simulated){
+            this.password = hashPassword(password);
+        }else{
+            logger.warning("Make sure your password is at least 10 characters long and contain letters and numbers");
+            throw new IllegalArgumentException();
+        }
     }
+
+    public User(){}
 
     public String hashPassword(String password){
         try{
@@ -55,11 +59,13 @@ abstract class User {
             }
             if (hasLetter && hasNumber && passLength) {
                 return
-                true; // Password meets the criteria
+                        true; // Password meets the criteria
             }
         }
         return false; // Password doesn't meet the criteria
     }
+
+    public int getId() { return id; }
 
     public String getfName() {
         return fName;
@@ -105,3 +111,4 @@ abstract class User {
                 '}';
     }
 }
+

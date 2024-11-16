@@ -1,3 +1,5 @@
+
+
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
@@ -5,10 +7,9 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+
 public class Vendor extends User implements Runnable{
-    private final ArrayList<Event> events = new ArrayList<Event>();
-    private static int nextId = 1;
-    private final int vendorId;
+    private ArrayList<Event> events = new ArrayList<>();
     private static final Logger logger = Logger.getLogger(Vendor.class.getName());
     private static int eventCreationFrequency;
 
@@ -28,7 +29,6 @@ public class Vendor extends User implements Runnable{
 
     public Vendor(String fName, String lName, String username, String password, String email, boolean simulated) {
         super(fName, lName, username, password, email, simulated);
-        this.vendorId = nextId++;
         if(Util.getStartOption() == 1){
             eventCreationFrequency = Util.generateRandomInt(Util.readJsonFile("Simulation", "event", "EventCreationFrequencyMin"), Util.readJsonFile("Simulation", "event", "EventCreationFrequencyMax"));
         }else{
@@ -36,16 +36,18 @@ public class Vendor extends User implements Runnable{
         }
     }
 
-    public int getVendorId() {
-        return vendorId;
-    }
+    public Vendor(){}
 
     public ArrayList<Event> getEvents() {
         return events;
     }
 
+    public void setEvents(ArrayList<Event> events) {
+        this.events = events;
+    }
+
     public void setEvents(Event event) {
-       this.events.add(event);
+        events.add(event);
     }
 
     @Override
@@ -58,8 +60,7 @@ public class Vendor extends User implements Runnable{
                     Util.generateForThreadTesting();
                 }
                 Util.getEvents().getLast().setVendor(this);
-                logger.info("New Event Created by Vendor:" + this.vendorId + " event: " + Util.getEvents().getLast());
-                Util.getEvents().getLast().startVendorThreads();
+                logger.info("New Event Created by Vendor:" + super.getId() + " event: " + Util.getEvents().getLast());
             }catch (IOException e){
                 logger.warning("Error occurred while trying to create an event: " + e);
             }
@@ -85,8 +86,9 @@ public class Vendor extends User implements Runnable{
         eventIdBuilder.append("]");
         return "Vendor{" +
                 "eventIds=" + eventIdBuilder +
-                ", id=" + vendorId +
+                ", id=" + super.getId() +
                 ", Event Creation Frequency=" + eventCreationFrequency +
                 "} " + super.toString();
     }
 }
+

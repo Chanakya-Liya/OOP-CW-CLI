@@ -1,20 +1,13 @@
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-
-public class Main{
-    public static void main(String[] args) throws InterruptedException {
+//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
+// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+public class Main {
+    public static void main(String[] args) {
         Util.validateConfig();
         Util.generateSimulatedUsers();
 
         for(Customer customer : Util.getCustomers()){
             Thread customerThread = new Thread(customer);
             customerThread.start();
-        }
-
-        for(Event event : Util.getEvents()){
-            event.startVendorThreads();
         }
 
         for(Vendor vendor : Util.getVendors()){

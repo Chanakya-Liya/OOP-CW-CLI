@@ -5,8 +5,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class Customer extends User implements Runnable {
-    private static int nextId = 1;
-    private final int CustomerId;
     private int retrievalRate;
     private int frequency;
     private static final Logger logger = Logger.getLogger(Customer.class.getName());
@@ -27,9 +25,12 @@ public class Customer extends User implements Runnable {
 
     public Customer(String fName, String lName, String username, String password, String email, boolean simulated, int retrievalRate, int frequency) {
         super(fName, lName, username, password, email, simulated);
-        CustomerId = nextId++;
         this.retrievalRate = retrievalRate;
         this.frequency = frequency;
+    }
+
+    public Customer() {
+        super();
     }
 
     public int getRetrievalRate() {
@@ -51,7 +52,7 @@ public class Customer extends User implements Runnable {
     public int getTotalTicket(){
         int totalTickets = 0;
         for(Event event : Util.getEvents()){
-            totalTickets += event.getTotalEventTickets();
+            totalTickets += event.getTotalTickets();
         }
         return totalTickets;
     }
@@ -69,7 +70,7 @@ public class Customer extends User implements Runnable {
                         synchronized (selectedEvent){
                             if(!Util.getEvents().get(eventId).getPoolTickets().isEmpty()){
                                 Util.getEvents().get(eventId).removeTicketFromPool();
-                                String message = String.format(messageTemplate, Util.getEvents().get(eventId).getId(), CustomerId, Util.getEvents().get(eventId).getPoolTickets().size());
+                                String message = String.format(messageTemplate, Util.getEvents().get(eventId).getId(), super.getId(), Util.getEvents().get(eventId).getPoolTickets().size());
                                 logger.info(message);
                                 flag = false;
                             }
@@ -86,9 +87,10 @@ public class Customer extends User implements Runnable {
     @Override
     public String toString() {
         return "Customer{" +
-                "CustomerId=" + CustomerId +
+                "CustomerId=" + super.getId() +
                 ", retrievalRate=" + retrievalRate +
                 ", frequency=" + frequency +
                 "} " + super.toString();
     }
 }
+

@@ -1,54 +1,47 @@
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Event{
     private static int nextId = 1;
-    private final int id;
+    private int id;
     private Vendor vendor;
-    private ArrayList<Ticket> poolTickets = new ArrayList<Ticket>();
-    private ArrayList<Ticket> soldTickets = new ArrayList<Ticket>();
-    private ArrayList<Ticket> availableTickets = new ArrayList<Ticket>();
-    private final int poolSize;
-    private final int totalEventTickets;
-    private ArrayList<VendorEventAssociation> vendorEventAssociations = new ArrayList<VendorEventAssociation>();
+    private List<Ticket> tickets = new ArrayList<>();
+    private int poolSize;
+    private int totalTickets;
 
-    public Event(int poolSize, int totalEventTickets) {
+    public Event(int poolSize, int totalTickets) {
         this.id = nextId++;
         this.poolSize = poolSize;
-        this.totalEventTickets = totalEventTickets;
-        floodTickets(poolTickets, "pool");
-        floodTickets(availableTickets, "available");
-    }
+        this.totalTickets = totalTickets;
+        for (int i = 0; i < poolSize; i++) {
+            addTicket(TicketStatus.POOL);
+        }
 
-    public void floodTickets(ArrayList<Ticket> tickets, String status){
-        if(status.equalsIgnoreCase("pool")){
-            for(int i = 0; i < poolSize; i++){
-                Ticket ticket = new Ticket();
-                ticket.setEventId(this.id);
-                this.poolTickets.add(ticket);
-            }
-        }else{
-            for(int i = 0; i < (totalEventTickets - poolSize); i++){
-                Ticket ticket = new Ticket();
-                ticket.setEventId(this.id);
-                this.availableTickets.add(ticket);
-            }
+        for (int i = 0; i < (totalTickets - poolSize); i++) {
+            addTicket(TicketStatus.AVAILABLE);
         }
     }
 
-    public ArrayList<VendorEventAssociation> getVendorEventAssociations() {
-        return vendorEventAssociations;
+    public Event(){}
+
+    private void addTicket(TicketStatus status) {
+        Ticket ticket = new Ticket();
+        ticket.setEvent(this); // Very Important! Set bidirectional relationship
+        ticket.setStatus(status);
+        tickets.add(ticket);
     }
 
-    public void addVendorEventAssociations(VendorEventAssociation vendorEventAssociations) {
-        this.vendorEventAssociations.add(vendorEventAssociations);
+    public List<Ticket> getPoolTickets() {
+        return tickets.stream().filter(t -> t.getStatus() == TicketStatus.POOL).collect(Collectors.toList());
     }
 
-    public ArrayList<Ticket> getPoolTickets() {
-        return poolTickets;
+    public List<Ticket> getAvailableTickets() {
+        return tickets.stream().filter(t -> t.getStatus() == TicketStatus.AVAILABLE).collect(Collectors.toList());
     }
 
-    public ArrayList<Ticket> getAvailableTickets() {
-        return availableTickets;
+    public List<Ticket> getSoldTickets() {
+        return tickets.stream().filter(t -> t.getStatus() == TicketStatus.SOLD).collect(Collectors.toList());
     }
 
     public int getId() {
@@ -59,56 +52,43 @@ public class Event{
         return vendor;
     }
 
-    public ArrayList<Ticket> getSoldTickets() {
-        return soldTickets;
-    }
-
     public int getPoolSize() {
         return poolSize;
     }
 
-    public int getTotalEventTickets() {
-        return totalEventTickets;
+    public int getTotalTickets() {
+        return totalTickets;
     }
 
     public void setVendor(Vendor vendor) {
         this.vendor = vendor;
     }
 
-    public void removeTicketFromPool(){
-        Ticket ticket = poolTickets.getFirst();
-        poolTickets.removeFirst();
-        soldTickets.add(ticket);
+    public void removeTicketFromPool() {
+        tickets.stream().filter(t -> t.getStatus() == TicketStatus.POOL).findFirst()
+                .ifPresent(t -> t.setStatus(TicketStatus.SOLD));
     }
 
-    public void addTicketToPool(){
-        Ticket ticket = availableTickets.getFirst();
-        poolTickets.add(ticket);
-        availableTickets.removeFirst();
+    public void addTicketToPool() {
+        tickets.stream().filter(t -> t.getStatus() == TicketStatus.AVAILABLE).findFirst()
+                .ifPresent(t -> t.setStatus(TicketStatus.POOL));
     }
 
-    public boolean allTicketsSold(){
-        return poolTickets.isEmpty() && availableTickets.isEmpty();
-    }
-
-    public void startVendorThreads() {
-        for (VendorEventAssociation association : vendorEventAssociations) {
-            Thread thread = new Thread(association);
-            thread.start();
-        }
+    public boolean allTicketsSold() {
+        return getPoolTickets().isEmpty() && getAvailableTickets().isEmpty();
     }
 
     @Override
     public String toString() {
         return "Event{" +
                 "id=" + id +
-                ", vendor=" + vendor.getVendorId() +
-                ", poolTickets=" + poolTickets.size() +
-                ", soldTickets=" + soldTickets.size() +
-                ", availableTickets=" + availableTickets.size() +
+                ", vendor=" + vendor.getId() +
+                ", pool tickets=" + tickets.stream().filter(t -> t.getStatus() == TicketStatus.POOL).count() +
+                ", sold tickets=" + tickets.stream().filter(t -> t.getStatus() == TicketStatus.SOLD).count() +
+                ", available tickets=" + tickets.stream().filter(t -> t.getStatus() == TicketStatus.AVAILABLE).count() +
                 ", poolSize=" + poolSize +
-                ", totalEventTickets=" + totalEventTickets +
-                ", vendorEventAssociations=" + vendorEventAssociations +
+                ", totalTickets=" + totalTickets +
                 '}';
     }
 }
+
