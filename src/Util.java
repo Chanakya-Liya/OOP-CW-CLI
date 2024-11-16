@@ -417,7 +417,6 @@ public class Util {
 
             if(option == 1){
                 for(Customer customer : customers){
-                    customer.save();
                     logger.info(customer.toString());
                 }
                 logger.info("==================================================");
