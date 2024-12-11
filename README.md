@@ -9,7 +9,7 @@ Creating a simulation using pure Java to figure out how I want the Spring Boot a
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
--[Key Features](#key Features)
+-[Key Features](#keyfeatures)
 
 ## Introduction
 
@@ -84,7 +84,7 @@ Concurrency Handling: Utilizes Java threads to run users, events, and vendors co
 Configuration Validation: Ensures that all configurations are valid before starting the simulation, preventing errors and ensuring consistency.
 Comprehensive Simulation End: Gracefully ends the simulation, ensuring that all threads are properly terminated and resources are released. 
 
-## Key Features
+## keyfeatures
 Pure Java Implementation: The project uses pure Java without any external frameworks, showcasing the power and flexibility of the language.
 Complex Simulations: It simulates real-world interactions between users, events, and vendors, demonstrating the ability to handle complex scenarios.
 Concurrency Management: By effectively managing multiple threads, the project highlights advanced Java concurrency capabilities.
