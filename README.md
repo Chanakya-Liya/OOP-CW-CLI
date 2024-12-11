@@ -77,16 +77,16 @@ To install and run the project locally:
 Run the Main class to start the simulation. The application will validate the configuration, generate users, events, and vendors, and start their respective threads to simulate interactions.
 
 ## Features
-User Simulation: Generates and manages simulated users. Users are created with various attributes and behaviors, making the simulation dynamic and realistic.
-Event Simulation: Initializes events and starts vendor threads associated with them. Events are designed to interact with both users and vendors, creating a complex web of interactions.
-Vendor Simulation: Runs vendor threads to simulate their activities. Vendors provide services or goods to users and interact with events, adding another layer of complexity to the simulation.
-Concurrency Handling: Utilizes Java threads to run users, events, and vendors concurrently, ensuring that the simulation runs smoothly and efficiently.
-Configuration Validation: Ensures that all configurations are valid before starting the simulation, preventing errors and ensuring consistency.
-Comprehensive Simulation End: Gracefully ends the simulation, ensuring that all threads are properly terminated and resources are released. 
+- User Simulation: Generates and manages simulated users. Users are created with various attributes and behaviors, making the simulation dynamic and realistic.
+- Event Simulation: Initializes events and starts vendor threads associated with them. Events are designed to interact with both users and vendors, creating a complex web of interactions.
+- Vendor Simulation: Runs vendor threads to simulate their activities. Vendors provide services or goods to users and interact with events, adding another layer of complexity to the simulation.
+- Concurrency Handling: Utilizes Java threads to run users, events, and vendors concurrently, ensuring that the simulation runs smoothly and efficiently.
+- Configuration Validation: Ensures that all configurations are valid before starting the simulation, preventing errors and ensuring consistency.
+- Comprehensive Simulation End: Gracefully ends the simulation, ensuring that all threads are properly terminated and resources are released.
 
 ## Key Features
-Pure Java Implementation: The project uses pure Java without any external frameworks, showcasing the power and flexibility of the language.
-Complex Simulations: It simulates real-world interactions between users, events, and vendors, demonstrating the ability to handle complex scenarios.
-Concurrency Management: By effectively managing multiple threads, the project highlights advanced Java concurrency capabilities.
-Foundation for Spring Boot: This project serves as a prototype for a future Spring Boot application, providing valuable insights and groundwork for further development.
-Dynamic and Scalable: The simulation can be expanded with more users, events, and vendors, making it scalable and adaptable to various scenarios.
+- Pure Java Implementation: The project uses pure Java without any external frameworks, showcasing the power and flexibility of the language.
+- Complex Simulations: It simulates real-world interactions between users, events, and vendors, demonstrating the ability to handle complex scenarios.
+- Concurrency Management: By effectively managing multiple threads, the project highlights advanced Java concurrency capabilities.
+- Foundation for Spring Boot: This project serves as a prototype for a future Spring Boot application, providing valuable insights and groundwork for further development.
+- Dynamic and Scalable: The simulation can be expanded with more users, events, and vendors, making it scalable and adaptable to various scenarios.
