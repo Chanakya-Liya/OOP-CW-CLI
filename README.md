@@ -9,7 +9,7 @@ Creating a simulation using pure Java to figure out how I want the Spring Boot a
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
--[Key Features](#Key Features)
+- [Key Features](#key-features)
 
 ## Introduction
 
