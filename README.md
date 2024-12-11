@@ -1,6 +1,3 @@
-Based on the gathered information, here is an extensive README file for your project:
-
-```
 # OOP-CW-CLI
 
 Creating a simulation using pure Java to figure out how I want the Spring Boot application to work.
@@ -101,5 +98,3 @@ If you would like to contribute to this project, please follow these steps:
 ## License
 
 This project is currently not licensed. Please contact the repository owner for more details.
-
-```
