@@ -1,3 +1,6 @@
+Based on the gathered information, here is an extensive README file for your project:
+
+```
 # OOP-CW-CLI
 
 Creating a simulation using pure Java to figure out how I want the Spring Boot application to work.
@@ -50,38 +53,53 @@ public class Main{
 
         Util.endProgram();
     }
-} ```
-Public code references from 1 repository
-Installation
+}
+```
+
+## Installation
+
 To install and run the project locally:
 
-Clone the repository:
-git clone https://github.com/Chanakya-Liya/OOP-CW-CLI.git
-Public code references from 1 repository
-Navigate to the project directory:
-cd OOP-CW-CLI
-Public code references from 1 repository
-Compile the project:
-javac -d bin src/*.java
-Public code references from 1 repository
-Run the application:
-java -cp bin Main
-Public code references from 1 repository
-Usage
-Run the Main class to start the simulation. The application will validate the configuration, generate users, events, and vendors, and start their respective threads to simulate interactions.
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/Chanakya-Liya/OOP-CW-CLI.git
+    ```
+2. Navigate to the project directory:
+    ```sh
+    cd OOP-CW-CLI
+    ```
+3. Compile the project:
+    ```sh
+    javac -d bin src/*.java
+    ```
+4. Run the application:
+    ```sh
+    java -cp bin Main
+    ```
 
-Features
-User Simulation: Generates and manages simulated users.
-Event Simulation: Initializes events and starts vendor threads associated with them.
-Vendor Simulation: Runs vendor threads to simulate their activities.
-Contributing
+## Usage
+
+Run the `Main` class to start the simulation. The application will validate the configuration, generate users, events, and vendors, and start their respective threads to simulate interactions.
+
+## Features
+
+- **User Simulation**: Generates and manages simulated users.
+- **Event Simulation**: Initializes events and starts vendor threads associated with them.
+- **Vendor Simulation**: Runs vendor threads to simulate their activities.
+
+## Contributing
+
 If you would like to contribute to this project, please follow these steps:
 
-Fork the repository.
-Create a new branch (git checkout -b feature-branch).
-Make your changes.
-Commit your changes (git commit -m 'Add some feature').
-Push to the branch (git push origin feature-branch).
-Create a new Pull Request.
-License
-This project is licensed under the MIT License.
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add some feature'`).
+5. Push to the branch (`git push origin feature-branch`).
+6. Create a new Pull Request.
+
+## License
+
+This project is currently not licensed. Please contact the repository owner for more details.
+
+```
