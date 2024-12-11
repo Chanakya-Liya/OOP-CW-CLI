@@ -50,7 +50,7 @@ public class Main{
 
         Util.endProgram();
     }
-}
+} ```
 Public code references from 1 repository
 Installation
 To install and run the project locally:
